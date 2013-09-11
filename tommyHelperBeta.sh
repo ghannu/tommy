@@ -1,4 +1,8 @@
 #!/bin/bash
+# set the time interval and total number of sample while tailing logs
+repeatSample=6
+repeatTimeGap=3	
+
 while getopts :t:c:p: TIMED 
 do
        case $TIMED in 
@@ -156,13 +160,13 @@ echo -e '\E[31;31m \t\t\t\t\t tailing logs - '$selectedTomcat'';
 echo  -e '\E[32;32m \t==============================================================================================='; tput sgr0
 
 logFileName=$selectedTomcatLocation/logs/server.log
-        for i in {1..2}
-        do
+for (( c=1; c<=$repeatSample ;  c++ )) 
+       do
         if [[  -f $logFileName ]]; then
                 tail -f $selectedTomcatLocation/logs/server.log
         else
-                echo -e '\E[31;31m \t\t\t\t\t No logs found, waiting for 5 sec and trying again'; tput sgr0
-                sleep 5
+                echo -e "\E[31;31m \t\t\t\t\t No logs found, waiting for $repeatTimeGap sec and trying again"; tput sgr0 
+                sleep "$repeatTimeGap"
         fi
         done
         if [[  -f $logFileName ]]; then
@@ -192,13 +196,13 @@ echo -e '\E[31;31m \t\t\t\t\t tailing logs - '$selectedTomcat'';
 echo  -e '\E[32;32m \t==============================================================================================='; tput sgr0
 
 	logFileName=$selectedTomcatLocation/logs/server.log
-        for i in {1..2}
+for (( c=1; c<=$repeatSample ;  c++ ))
         do
         if [[  -f $logFileName ]]; then
                 tail -f $selectedTomcatLocation/logs/server.log
         else
-                echo -e '\E[31;31m \t\t\t\t\t No logs found, waiting for 5 sec and trying again'; tput sgr0
-                sleep 5
+	        echo -e "\E[31;31m \t\t\t\t\t No logs found, waiting for $repeatTimeGap sec and trying again"; tput sgr0 
+                sleep "$repeatTimeGap"
         fi
         done
         if [[  -f $logFileName ]]; then
@@ -251,7 +255,17 @@ rm -rvf $selectedTomcatLocation/logs/* ;;
 echo  -e '\E[32;32m \t==============================================================================================='
 echo -e '\E[31;31m \t\t\t\t\t cleaning webapps - '$selectedTomcat'';
 echo  -e '\E[32;32m \t==============================================================================================='; tput sgr0
-cd $selectedTomcatLocation ;;
+rootcheck=echo ls "$selectedTomcatLocation/webapps/" | grep 'ROOT' 
+mkdir -p /tmp/tommybackup/
+
+	if [[ -z $rootCheck ]]; then
+		rm -rf $selectedTomcatLocation/webapps/
+		mkdir -p $selectedTomcatLocation/webapps/	
+	else
+		 rm -rf $selectedTomcatLocation/webapps/
+		 mkdir -p $selectedTomcatLocation/webapps/
+		 mkdir -p $selectedTomcatLocation/webapps/ROOT/ 
+	fi;;
 
 7) 
 echo  -e '\E[32;32m \t==============================================================================================='
@@ -298,13 +312,13 @@ echo  -e '\E[32;32m \t==========================================================
 
 
 logFileName=$selectedTomcatLocation/logs/server.log
-        for i in {1..2}
+for (( c=1; c<=$repeatSample ;  c++ ))
         do
         if [[  -f $logFileName ]]; then
                 tail -f $selectedTomcatLocation/logs/server.log
         else
-                echo -e '\E[31;31m \t\t\t\t\t\ No logs found, waiting for 5 sec and trying again'; tput sgr0
-                sleep 5
+                echo -e "\E[31;31m \t\t\t\t\t No logs found, waiting for $repeatTimeGap sec and trying again"; tput sgr0
+                sleep "$repeatTimeGap"
         fi
         done
         if [[  -f $logFileName ]]; then
@@ -315,4 +329,3 @@ logFileName=$selectedTomcatLocation/logs/server.log
                 ls -ltr $selectedTomcatLocation/logs/
         fi;;
 esac
-
