@@ -1,7 +1,31 @@
 #!/bin/bash
 # set the time interval and total number of sample while tailing logs
-repeatSample=6
-repeatTimeGap=3	
+repeatSample=7
+repeatTimeGap=4	
+
+# function to tail logs
+taillog () {
+logFileName=$1/logs/server.log
+tempTomcatLocation=$1
+for (( c=1; c<=$repeatSample ;  c++ ))
+        do
+        if [[  -f $logFileName ]]; then
+                tail -f $tempTomcatLocation/logs/server.log
+        else
+                echo -e "\E[31;31m \t\t\t\t\t No logs found, waiting for $repeatTimeGap sec and trying again"; tput sgr0
+                sleep "$repeatTimeGap"
+        fi
+        done
+        if [[  -f $logFileName ]]; then
+                tail -f $tempTomcatLocation/logs/server.log
+        else
+                echo -e '\E[31;31m \t\t\t\t\t No logs are generating, may be some prbm, please view others logs'; tput sgr0
+                cd $tempTomcatLocation/logs/
+                ls -ltr tempTomcatLocation/logs/
+        fi
+}
+
+#to take inline parameter
 
 while getopts :t:c:p: TIMED 
 do
@@ -159,24 +183,7 @@ echo  -e '\E[32;32m \t==========================================================
 echo -e '\E[31;31m \t\t\t\t\t tailing logs - '$selectedTomcat'';
 echo  -e '\E[32;32m \t==============================================================================================='; tput sgr0
 
-logFileName=$selectedTomcatLocation/logs/server.log
-for (( c=1; c<=$repeatSample ;  c++ )) 
-       do
-        if [[  -f $logFileName ]]; then
-                tail -f $selectedTomcatLocation/logs/server.log
-        else
-                echo -e "\E[31;31m \t\t\t\t\t No logs found, waiting for $repeatTimeGap sec and trying again"; tput sgr0 
-                sleep "$repeatTimeGap"
-        fi
-        done
-        if [[  -f $logFileName ]]; then
-                tail -f $selectedTomcatLocation/logs/server.log
-        else
-                echo -e '\E[31;31m \t\t\t\t\t No logs are generating, may be some prbm, please view others logs'; tput sgr0
-                cd $selectedTomcatLocation/logs/
-                ls -ltr $selectedTomcatLocation/logs/
-	fi;;
-
+taillog $selectedTomcatLocation;;
 
 2) 
 echo  -e '\E[32;32m \t==============================================================================================='
@@ -195,24 +202,7 @@ echo  -e '\E[32;32m \t==========================================================
 echo -e '\E[31;31m \t\t\t\t\t tailing logs - '$selectedTomcat'';
 echo  -e '\E[32;32m \t==============================================================================================='; tput sgr0
 
-	logFileName=$selectedTomcatLocation/logs/server.log
-for (( c=1; c<=$repeatSample ;  c++ ))
-        do
-        if [[  -f $logFileName ]]; then
-                tail -f $selectedTomcatLocation/logs/server.log
-        else
-	        echo -e "\E[31;31m \t\t\t\t\t No logs found, waiting for $repeatTimeGap sec and trying again"; tput sgr0 
-                sleep "$repeatTimeGap"
-        fi
-        done
-        if [[  -f $logFileName ]]; then
-                tail -f $selectedTomcatLocation/logs/server.log
-        else
-                echo -e '\E[31;31m \t\t\t\t\t No logs are generating, may be some prbm, please view others logs'; tput sgr0
-                cd $selectedTomcatLocation/logs/
-                ls -ltr $selectedTomcatLocation/logs/
-        fi;;
-
+taillog $selectedTomcatLocation;;
 
 3) 
 echo  -e '\E[32;32m \t==============================================================================================='
@@ -310,22 +300,7 @@ echo  -e '\E[32;32m \t==========================================================
 echo -e '\E[31;31m \t\t\t\t\t tailing logs - '$selectedTomcat'';
 echo  -e '\E[32;32m \t==============================================================================================='; tput sgr0
 
+taillog "$selectedTomcatLocation" ;;
 
-logFileName=$selectedTomcatLocation/logs/server.log
-for (( c=1; c<=$repeatSample ;  c++ ))
-        do
-        if [[  -f $logFileName ]]; then
-                tail -f $selectedTomcatLocation/logs/server.log
-        else
-                echo -e "\E[31;31m \t\t\t\t\t No logs found, waiting for $repeatTimeGap sec and trying again"; tput sgr0
-                sleep "$repeatTimeGap"
-        fi
-        done
-        if [[  -f $logFileName ]]; then
-                tail -f $selectedTomcatLocation/logs/server.log
-        else
-                echo -e '\E[31;31m \t\t\t\t\t No logs are generating, may be some prbm, please view others logs'; tput sgr0
-                cd $selectedTomcatLocation/logs/
-                ls -ltr $selectedTomcatLocation/logs/
-        fi;;
 esac
+
