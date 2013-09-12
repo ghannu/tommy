@@ -77,7 +77,7 @@ grep "\<Connector port=" $temp_tommy_home$line'/conf/server.xml' > /tmp/connecto
 tempconnector=(`cat /tmp/connector.txt`)
 connectorPort[$count]=`echo ${tempconnector[1]} | awk -F\" '{print $2}'`
 
-tomcatpid[$count]=$(ps -afe | grep $temp_tommy_home$line | grep -v grep | awk '{print $2}')
+tomcatpid[$count]=$(ps -afe | grep "$temp_tommy_home$line/" | grep -v grep | awk '{print $2}')
 
 let count++
 fi
@@ -190,12 +190,9 @@ echo  -e '\E[32;32m \t==========================================================
 echo -e '\E[31;31m \t\t\t\t\t Restarting - '$selectedTomcat'';
 echo  -e '\E[32;32m \t==============================================================================================='; tput sgr0
 
-	pid=$(ps -afe | grep $selectedTomcatLocation | grep -v grep | awk '{print $2}')
+	pid=$(ps -afe | grep "$selectedTomcatLocation/" | grep -v grep | awk '{print $2}')
         if [[ -n $pid ]]; then
                 kill -9 $pid
-                echo -e '\E[31;31m \t\t\t\t\t !!!Tomcat Killed!!!'; tput sgr0 
-        else
-                echo -e '\E[36;36m \t\t\t\t\t !Tomcat not started!'; tput sgr0
         fi
         $selectedTomcatLocation/bin/startup.sh
 echo  -e '\E[32;32m \t==============================================================================================='
@@ -209,7 +206,7 @@ echo  -e '\E[32;32m \t==========================================================
 echo -e '\E[31;31m \t\t\t\t\t Shutting Down - '$selectedTomcat'';
 echo  -e '\E[32;32m \t==============================================================================================='; tput sgr0
 
-pid=$(ps -afe | grep $selectedTomcatLocation | grep -v grep | awk '{print $2}')
+pid=$(ps -afe | grep "$selectedTomcatLocation/" | grep -v grep | awk '{print $2}')
 	if [[ -n $pid ]];then
 		$selectedTomcatLocation/bin/shutdown.sh
 		sleep 6
@@ -219,13 +216,13 @@ pid=$(ps -afe | grep $selectedTomcatLocation | grep -v grep | awk '{print $2}')
                 echo -e '\E[36;31m \t\t\t\t\t !Tomcat not started!'; tput sgr0
 	fi
 echo -e '\E[31;31m searching for select '$selectedTomcat' again';tput sgr0
-ps -afe | grep $selectedTomcatLocation;;
+ps -afe | grep "$selectedTomcatLocation/";;
 
 4)
 echo  -e '\E[32;32m \t==============================================================================================='
 echo -e '\E[31;31m \t\t\t\t\t Force killing - '$selectedTomcat'';
 echo  -e '\E[32;32m \t==============================================================================================='; tput sgr0
-pid=$(ps -afe | grep $selectedTomcatLocation | grep -v grep | awk '{print $2}')
+pid=$(ps -afe | grep "$selectedTomcatLocation/" | grep -v grep | awk '{print $2}')
         if [[ -n $pid ]]; then
                 kill -9 $pid
                 echo -e '\E[31;31m \t\t\t\t\t !!!Tomcat Killed!!!'; tput sgr0
@@ -233,7 +230,7 @@ pid=$(ps -afe | grep $selectedTomcatLocation | grep -v grep | awk '{print $2}')
                 echo -e '\E[36;36m \t\t\t\t\t !Tomcat not started!'; tput sgr0
         fi 
 echo -e '\E[31;31m searching for select '$selectedTomcat' again';tput sgr0
-ps -afe | grep $selectedTomcatLocation;;
+ps -afe | grep "$selectedTomcatLocation/";;
 
 5) 
 echo  -e '\E[32;32m \t==============================================================================================='
@@ -245,17 +242,22 @@ rm -rvf $selectedTomcatLocation/logs/* ;;
 echo  -e '\E[32;32m \t==============================================================================================='
 echo -e '\E[31;31m \t\t\t\t\t cleaning webapps - '$selectedTomcat'';
 echo  -e '\E[32;32m \t==============================================================================================='; tput sgr0
-rootcheck=echo ls "$selectedTomcatLocation/webapps/" | grep 'ROOT' 
-mkdir -p /tmp/tommybackup/
 
-	if [[ -z $rootCheck ]]; then
-		rm -rf $selectedTomcatLocation/webapps/
-		mkdir -p $selectedTomcatLocation/webapps/	
+ls $selectedTomcatLocation/webapps/ > /tmp/webappsdirectories
+
+#itering over each directory of given location
+
+while read lime
+do
+	if [[ $lime != "ROOT" && $lime != "ckeditor" ]]; then
+		rm -rf $selectedTomcatLocation/webapps/$lime/
 	else
-		 rm -rf $selectedTomcatLocation/webapps/
-		 mkdir -p $selectedTomcatLocation/webapps/
-		 mkdir -p $selectedTomcatLocation/webapps/ROOT/ 
-	fi;;
+		if [[ $lime != "ckeditor" ]];then
+			  rm -rf $selectedTomcatLocation/webapps/$lime/
+			  mkdir -p $selectedTomcatLocation/webapps/$lime/ 
+		fi
+	fi
+done < /tmp/webappsdirectories ;;
 
 7) 
 echo  -e '\E[32;32m \t==============================================================================================='
